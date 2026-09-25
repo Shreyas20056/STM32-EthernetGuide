@@ -1,0 +1,51 @@
+
+
+### Required Changes in `.ioc` (CubeMX)
+
+| Setting Location                  | What to Change                          | Recommended Value          | Why |
+|-----------------------------------|-----------------------------------------|----------------------------|-----|
+| **Middleware → LWIP → General Settings** | DHCP                                    | **Disabled**               | Easier and more reliable for testing |
+| **Middleware → LWIP → General Settings** | IP Address                              | `192.168.1.10`             | Fixed address for STM32 |
+| **Middleware → LWIP → General Settings** | Netmask                                 | `255.255.255.0`            | Same subnet as PC |
+| **Middleware → LWIP → General Settings** | Gateway                                 | `192.168.1.1`              | Standard (can leave blank if direct cable) |
+| **Middleware → LWIP**             | Make sure LWIP is enabled **only on Cortex-M7** | Enabled on M7 only        | Ethernet should run on M7 |
+| **Connectivity → ETH**            | Mode                                    | **RMII**                   | Already correct for H747I-DISCO |
+| **Connectivity → ETH**            | PHY                                     | **LAN8742**                | Already correct |
+
+---
+
+### Exact Steps in CubeMX
+
+1. Open your `.ioc` file.
+2. Go to **Middleware → LWIP**.
+3. Open **General Settings** tab.
+4. Set the following:
+   - **DHCP** → Disabled
+   - **IP Address** → `192.168.1.10`
+   - **Netmask** → `255.255.255.0`
+   - **Gateway** → `192.168.1.1`
+5. Make sure LWIP is assigned to **Cortex-M7** (not M4).
+6. Click **Generate Code**.
+
+---
+
+### After Generating Code
+
+You still need these software changes (already discussed):
+
+- `tcp_echoserver.h` and `tcp_echoserver.c` files
+- Updates in `main.c` (`tcp_echoserver_init()` + `MX_LWIP_Process()`)
+- Linker script section for Ethernet descriptors (important on H7)
+
+---
+
+### Final Network Setup (for later testing)
+
+| Device     | IP Address       |
+|------------|------------------|
+| STM32      | `192.168.1.10`   |
+| Your PC    | `192.168.1.20`   |
+| Port       | `7`              |
+
+---
+
